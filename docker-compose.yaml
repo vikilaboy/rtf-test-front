@@ -1,0 +1,26 @@
+version: '3'
+services:
+    front:
+        build: .
+        container_name: ${CONTAINER_NAME}
+        stdin_open: true
+        tty: true
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.middlewares.${CONTAINER_NAME}.compress=true"
+            - "traefik.http.routers.${CONTAINER_NAME}.rule=HostRegexp(`${APP_HOST}`)"
+            - "traefik.http.routers.${CONTAINER_NAME}.tls"
+            - "traefik.middlewares.headers.browserXSSFilter=true"
+            - "traefik.middlewares.headers.contentTypeNosniff=true"
+            - "traefik.port=80"
+            - "traefix.port=443"
+            - "traefik.docker.network=traefik_webgateway"
+        volumes: 
+            - "/app/node_modules"
+            - ".:/app"
+        networks:
+            - traefik            
+networks:
+    traefik:
+        external:
+            name: traefik_webgateway
